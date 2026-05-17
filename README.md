@@ -13,4 +13,4 @@ The engine tries to maximize forced move options and naturally derives useful ch
 - Position-dependent piece valuation based on mobility and available continuations.
 - Capability to discover strong behavior (e.g. mating attacks, defense of threatened pieces) from move-option maximization rather than explicit chess knowledge.
 
-By definition in this project, a side loses when no legal move options remain, which is represented as the king being removed from the board.
+By design, this project uses a simplified terminal-state model: a side loses when no legal move options remain, represented internally by the king being removed from the board (instead of standard chess checkmate notation).
