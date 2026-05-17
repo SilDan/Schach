@@ -2,10 +2,12 @@ package org.sildan.model.position;
 
 import org.sildan.model.Color;
 import org.sildan.model.moves.ChessMove;
+import org.sildan.model.pieces.Coordinates;
 import org.sildan.model.pieces.Piece;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Position {
     List<Piece> whitePiecesOnBoard;
@@ -50,4 +52,21 @@ public class Position {
         whoseTurn = whoseTurn.equals(Color.WHITE) ? Color.BLACK : Color.WHITE;
         movesPlayed.add(chessMove);
     }
+
+    public Optional<Piece> getPieceForColorAt(Coordinates coordinates, Color color)  {
+        List<Piece> pieces = color.equals(Color.WHITE) ? whitePiecesOnBoard : blackPiecesOnBoard;
+        for (Piece piece : pieces) {
+            if (piece.getCoordinates().equals(coordinates)) {
+                return Optional.of(piece);
+            }
+        }
+        return Optional.empty();
+    }
+
+    // getter for whoseTurn
+    public Color getWhoseTurn() {
+        return whoseTurn;
+    }
+
+
 }
