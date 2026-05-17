@@ -1,7 +1,10 @@
 package org.sildan.gui;
 
 import javafx.scene.Parent;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -10,9 +13,12 @@ import javafx.scene.shape.Rectangle;
  */
 public class ChessBoardView {
 
+    private static final double PIECE_SIZE_FACTOR = 0.78;
+
     private final int tileSize;
     private final int boardSize;
     private final ChessBoardViewModel viewModel;
+    private final SvgImageLoader svgImageLoader;
 
     /**
      * Creates a new chess board view.
@@ -25,6 +31,7 @@ public class ChessBoardView {
         this.tileSize = tileSize;
         this.boardSize = boardSize;
         this.viewModel = viewModel;
+        this.svgImageLoader = new SvgImageLoader();
     }
 
     /**
@@ -37,10 +44,9 @@ public class ChessBoardView {
 
         for (int gridY = 0; gridY < boardSize; gridY++) {
             for (int x = 0; x < boardSize; x++) {
-
                 int chessY = boardSize - 1 - gridY;
 
-                Rectangle square = createSquare(x, chessY);
+                StackPane square = createSquare(x, chessY);
                 board.add(square, x, gridY);
             }
         }
@@ -48,11 +54,27 @@ public class ChessBoardView {
         return board;
     }
 
-    private Rectangle createSquare(int x, int y) {
-        Rectangle square = new Rectangle(tileSize, tileSize);
+    private StackPane createSquare(int x, int y) {
+        Rectangle background = new Rectangle(tileSize, tileSize);
 
-        boolean isLightSquare = (x + y) % 2 == 0;
-        square.setFill(isLightSquare ? Color.web("#6FA8DC") : Color.BEIGE);
+        boolean isLightSquare = (x + y) % 2 != 0;
+        background.setFill(isLightSquare ? Color.BEIGE : Color.web("#6FA8DC"));
+
+        StackPane square = new StackPane(background);
+
+        String pieceImagePath = viewModel.getPieceImagePathAt(x, y);
+        if (!pieceImagePath.isBlank()) {
+            Image pieceImage = svgImageLoader.loadSvg(
+                    pieceImagePath,
+                    tileSize * PIECE_SIZE_FACTOR,
+                    tileSize * PIECE_SIZE_FACTOR
+            );
+
+            ImageView pieceImageView = new ImageView(pieceImage);
+            pieceImageView.setMouseTransparent(true);
+
+            square.getChildren().add(pieceImageView);
+        }
 
         square.setOnMouseClicked(event -> viewModel.handleSquareClick(x, y));
 

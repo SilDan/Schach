@@ -15,14 +15,14 @@ public class Position {
     List<ChessMove> movesPlayed;
     Color whoseTurn;
 
-    Position() {
+    public Position() {
         whitePiecesOnBoard = new ArrayList<>();
         blackPiecesOnBoard = new ArrayList<>();
         movesPlayed = new ArrayList<>();
         whoseTurn = Color.WHITE;
     }
 
-    void addPiece(Piece piece) {
+    public void addPiece(Piece piece) {
         if (piece.getColor().equals(Color.WHITE)) {
             whitePiecesOnBoard.add(piece);
         } else {
