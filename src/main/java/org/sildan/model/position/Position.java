@@ -10,10 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class Position {
-    List<Piece> whitePiecesOnBoard;
-    List<Piece> blackPiecesOnBoard;
-    List<ChessMove> movesPlayed;
-    Color whoseTurn;
+
+    private final List<Piece> whitePiecesOnBoard;
+    private final List<Piece> blackPiecesOnBoard;
+    private final List<ChessMove> movesPlayed;
+    private Color whoseTurn;
 
     public Position() {
         whitePiecesOnBoard = new ArrayList<>();
@@ -33,40 +34,69 @@ public class Position {
     public List<Piece> getWhitePiecesOnBoard() {
         return whitePiecesOnBoard;
     }
+
     public List<Piece> getBlackPiecesOnBoard() {
         return blackPiecesOnBoard;
     }
 
     public void executeMove(ChessMove chessMove) {
+        List<Piece> ownPieces = getPiecesForColor(whoseTurn);
+        Color opponentColor = getOpponentColor(whoseTurn);
+        List<Piece> opponentPieces = getPiecesForColor(opponentColor);
 
-        if (whoseTurn.equals(Color.WHITE)) {
-            for (Piece piece : whitePiecesOnBoard) {
-                if (piece.getCoordinates().equals(chessMove.getFrom())) {
-                    piece.setCoordinate(chessMove.getTo());
-                }
-                if (piece.getCoordinates().equals(chessMove.getTo())) {
-                chessMove.setCaptured(piece.getType());
-                }
-            }
+        Piece movingPiece = findPieceAt(chessMove.getFrom(), ownPieces)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No " + whoseTurn + " piece found at " + chessMove.getFrom()
+                ));
+
+        Optional<Piece> ownPieceAtTarget = findPieceAt(chessMove.getTo(), ownPieces);
+        if (ownPieceAtTarget.isPresent()) {
+            throw new IllegalArgumentException("Cannot move to a square occupied by an own piece.");
         }
-        whoseTurn = whoseTurn.equals(Color.WHITE) ? Color.BLACK : Color.WHITE;
+
+        Optional<Piece> capturedPiece = findPieceAt(chessMove.getTo(), opponentPieces);
+        capturedPiece.ifPresent(piece -> {
+            chessMove.setCaptured(piece.getType());
+            opponentPieces.remove(piece);
+        });
+
+        movingPiece.setCoordinate(chessMove.getTo());
         movesPlayed.add(chessMove);
+        whoseTurn = opponentColor;
     }
 
-    public Optional<Piece> getPieceForColorAt(Coordinates coordinates, Color color)  {
-        List<Piece> pieces = color.equals(Color.WHITE) ? whitePiecesOnBoard : blackPiecesOnBoard;
+    public Optional<Piece> getPieceForColorAt(Coordinates coordinates, Color color) {
+        List<Piece> pieces = getPiecesForColor(color);
+        return findPieceAt(coordinates, pieces);
+    }
+
+    public Color getWhoseTurn() {
+        return whoseTurn;
+    }
+
+    private List<Piece> getPiecesForColor(Color color) {
+        if (color.equals(Color.WHITE)) {
+            return whitePiecesOnBoard;
+        }
+
+        if (color.equals(Color.BLACK)) {
+            return blackPiecesOnBoard;
+        }
+
+        throw new IllegalArgumentException("Unsupported color: " + color);
+    }
+
+    private Color getOpponentColor(Color color) {
+        return color.equals(Color.WHITE) ? Color.BLACK : Color.WHITE;
+    }
+
+    private Optional<Piece> findPieceAt(Coordinates coordinates, List<Piece> pieces) {
         for (Piece piece : pieces) {
             if (piece.getCoordinates().equals(coordinates)) {
                 return Optional.of(piece);
             }
         }
+
         return Optional.empty();
     }
-
-    // getter for whoseTurn
-    public Color getWhoseTurn() {
-        return whoseTurn;
-    }
-
-
 }

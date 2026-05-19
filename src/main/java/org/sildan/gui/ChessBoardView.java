@@ -20,6 +20,8 @@ public class ChessBoardView {
     private final ChessBoardViewModel viewModel;
     private final SvgImageLoader svgImageLoader;
 
+    private GridPane board;
+
     /**
      * Creates a new chess board view.
      *
@@ -40,8 +42,20 @@ public class ChessBoardView {
      * @return the JavaFX parent node containing the board
      */
     public Parent createBoard() {
-        GridPane board = new GridPane();
+        board = new GridPane();
+        populateBoard();
+        return board;
+    }
 
+    /**
+     * Redraws the board based on the current position.
+     */
+    public void refreshBoard() {
+        board.getChildren().clear();
+        populateBoard();
+    }
+
+    private void populateBoard() {
         for (int gridY = 0; gridY < boardSize; gridY++) {
             for (int x = 0; x < boardSize; x++) {
                 int chessY = boardSize - 1 - gridY;
@@ -50,8 +64,6 @@ public class ChessBoardView {
                 board.add(square, x, gridY);
             }
         }
-
-        return board;
     }
 
     private StackPane createSquare(int x, int y) {

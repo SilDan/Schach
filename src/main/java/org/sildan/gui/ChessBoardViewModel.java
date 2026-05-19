@@ -1,11 +1,13 @@
 package org.sildan.gui;
 
 import org.sildan.model.Color;
+import org.sildan.model.moves.ChessMove;
 import org.sildan.model.pieces.Coordinates;
 import org.sildan.model.pieces.Piece;
 import org.sildan.model.pieces.PieceType;
 import org.sildan.model.position.Position;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,6 +18,15 @@ import java.util.Optional;
 public class ChessBoardViewModel {
 
     private final Position position;
+
+    private final List<ChessMove> scriptedMoves = List.of(
+            new ChessMove(new Coordinates(4, 1), new Coordinates(4, 3)), // e2 -> e4
+            new ChessMove(new Coordinates(4, 6), new Coordinates(4, 4)), // e7 -> e5
+            new ChessMove(new Coordinates(6, 0), new Coordinates(5, 2)), // g1 -> f3
+            new ChessMove(new Coordinates(1, 7), new Coordinates(2, 5))  // b8 -> c6
+    );
+
+    private int nextScriptedMoveIndex = 0;
 
     /**
      * Creates a new chess board view model.
@@ -47,6 +58,29 @@ public class ChessBoardViewModel {
         }
 
         return "";
+    }
+
+    /**
+     * Plays the next move from the predefined move sequence.
+     *
+     * @return true if a move was played, false if no scripted move is left
+     */
+    public boolean playNextScriptedMove() {
+        if (nextScriptedMoveIndex >= scriptedMoves.size()) {
+            System.out.println("No scripted moves left.");
+            return false;
+        }
+
+        ChessMove nextMove = scriptedMoves.get(nextScriptedMoveIndex);
+        position.executeMove(nextMove);
+        nextScriptedMoveIndex++;
+
+        System.out.println("Played scripted move: "
+                + nextMove.getFrom()
+                + " -> "
+                + nextMove.getTo());
+
+        return true;
     }
 
     /**

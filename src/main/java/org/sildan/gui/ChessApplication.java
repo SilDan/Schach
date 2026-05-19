@@ -2,6 +2,7 @@ package org.sildan.gui;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.sildan.model.Color;
 import org.sildan.model.pieces.Coordinates;
@@ -29,6 +30,16 @@ public class ChessApplication extends Application {
                 TILE_SIZE * BOARD_SIZE,
                 TILE_SIZE * BOARD_SIZE
         );
+
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                boolean moveWasPlayed = viewModel.playNextScriptedMove();
+
+                if (moveWasPlayed) {
+                    chessBoardView.refreshBoard();
+                }
+            }
+        });
 
         stage.setTitle("Sildan Chess");
         stage.setScene(scene);
